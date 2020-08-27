@@ -1,4 +1,4 @@
-# this에 대해서
+# javascript에서의 this란
 
 자바스크립트에 대해서 조금 더 배우다보면 내가 알고 있다고 생각했던 this가 헷갈리기 시작한다.
 
@@ -93,4 +93,54 @@ $('div').on('click', function() {
   }
   inner();
 });
+```
+
+**리엑트에서 사용할때에도 똑같은 문제가 발생한다**.
+
+이벤트를 따로 바인드 하지않으면 onClickButton의 this는 inner처럼 window나 undefined를 가리킨다.
+
+```jsx
+class Basic extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      hidden: false,
+    };
+    this.onClickButton = this.onClickButton.bind(this);
+  }
+
+  onClickButton() {
+    this.setState(() => ({ hidden: true }));
+  }
+
+  render() {
+    return (
+      <div>
+        <span>저는 {this.props.lang} 전문 {this.props.name}입니다!</span>
+        {!this.state.hidden && <span>{this.props.birth}년에 태어났습니다.</span>}
+        <button onClick={this.onClickButton}>숨기기</button>
+      </div>
+    );
+  }
+}
+```
+
+지금 onClickButton의 this는 Click 이벤트 리스너의 잘못으로 window를 가리키고 있다.
+
+어떻게하면 onClickButton의 this가 class를 바라보게 할 수 있을까?
+
+### 🌟 onClickButton를 bind 하거나 화살표 함수를 사용하면 된다!
+
+먼저 onClickButton를 constructor에서 bind하게되면 onClickButton의 this는 class를 바라보게 된다.
+
+```jsx
+this.onClickButton = this.onClickButton.bind(this);
+```
+
+onClickButton를 화살표 함수로 사용하게 되면 this는 자연스럽게 상위 this를 사용하게 된다.
+
+```jsx
+onClickButton = () => {
+	this.setState(() => ({ hidden: true }));
+}
 ```
